@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Explore and safely mock-run code snippets from Markdown notes.">
+  <title>Snippet Atlas</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <a class="brand" href="/" aria-label="Snippet Atlas home">
+        <span class="brand-mark" aria-hidden="true">{ }</span>
+        <span><strong>Snippet</strong> Atlas</span>
+      </a>
+      <div class="header-actions">
+        <span class="status-dot" aria-hidden="true"></span>
+        <span class="status-label">Local workspace</span>
+        <button class="icon-button" id="theme-toggle" type="button" aria-label="Switch to light theme" title="Toggle theme">☼</button>
+      </div>
+    </header>
+
+    <main class="content">
+      <section class="intro" aria-labelledby="page-title">
+        <div>
+          <p class="eyebrow">Markdown intelligence / 01</p>
+          <h1 id="page-title">Your notes, <em>made runnable.</em></h1>
+          <p class="lede">Scan local Markdown, surface the useful bits, and test ideas without executing a single line.</p>
+        </div>
+        <div class="scan-panel">
+          <label for="folder-input">Notes folder</label>
+          <div class="scan-controls">
+            <input id="folder-input" type="text" value="./sample_notes" autocomplete="off">
+            <button class="primary-button" id="scan-button" type="button"><span aria-hidden="true">↗</span> Scan folder</button>
+          </div>
+          <p class="field-hint">A local path on this machine</p>
+        </div>
+      </section>
+
+      <div class="error-banner" id="error-banner" role="alert" hidden></div>
+
+      <section class="stats-grid" aria-label="Scan statistics">
+        <div class="stat-card stat-featured"><span class="stat-label">Files scanned</span><strong id="stat-files">—</strong><span class="stat-note">Markdown sources</span></div>
+        <div class="stat-card"><span class="stat-label">Snippets found</span><strong id="stat-snippets">—</strong><span class="stat-note">Across your notes</span></div>
+        <div class="stat-card"><span class="stat-label">Python</span><strong id="stat-python">—</strong><span class="stat-note">Ready to inspect</span></div>
+        <div class="stat-card"><span class="stat-label">JavaScript</span><strong id="stat-javascript">—</strong><span class="stat-note">Ready to inspect</span></div>
+      </section>
+
+      <section class="workspace" aria-labelledby="library-title">
+        <div class="workspace-heading">
+          <div>
+            <p class="eyebrow">Library</p>
+            <h2 id="library-title">Code inventory</h2>
+          </div>
+          <span class="result-count" id="result-count" aria-live="polite"></span>
+        </div>
+        <div class="toolbar">
+          <label class="search-field" for="search-input">
+            <span aria-hidden="true">⌕</span>
+            <input id="search-input" type="search" placeholder="Search snippets, files, headings..." autocomplete="off">
+          </label>
+          <div class="filter-chips" role="group" aria-label="Filter by language">
+            <button class="filter-chip active" type="button" data-language="">All</button>
+            <button class="filter-chip" type="button" data-language="python">Python</button>
+            <button class="filter-chip" type="button" data-language="javascript">JavaScript</button>
+          </div>
+          <label class="toggle-control" for="group-toggle"><input id="group-toggle" type="checkbox"><span class="toggle-track" aria-hidden="true"></span><span>Group by file</span></label>
+        </div>
+        <div class="loading-state" id="loading-state" hidden><span class="spinner" aria-hidden="true"></span><span>Scanning your notes...</span></div>
+        <div class="empty-state" id="empty-state" hidden><span class="empty-icon" aria-hidden="true">∅</span><h3>No snippets found</h3><p>Try another folder, search term, or language filter.</p></div>
+        <div class="snippet-grid" id="snippet-list" aria-live="polite"></div>
+      </section>
+    </main>
+    <footer class="footer"><span>Snippet Atlas</span><span>Local-first · Mock execution only</span></footer>
+  </div>
+  <script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>
