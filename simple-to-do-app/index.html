@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>To-Do List</title>
+  <style>
+    :root {
+      --bg: #f4f5f7;
+      --card: #ffffff;
+      --text: #1f2933;
+      --muted: #6b7280;
+      --border: #e5e7eb;
+      --accent: #2563eb;
+      --accent-hover: #1d4ed8;
+      --danger: #dc2626;
+      --danger-hover: #b91c1c;
+      --radius: 12px;
+      --focus: 0 0 0 3px rgba(37, 99, 235, 0.35);
+    }
+
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      margin: 0;
+      min-height: 100%;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.4;
+      padding: 24px 16px;
+    }
+
+    main {
+      width: 100%;
+      max-width: 480px;
+      margin: 0 auto;
+      background: var(--card);
+      border-radius: var(--radius);
+      padding: 24px;
+      box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+    }
+
+    h1 {
+      margin: 0 0 16px;
+      font-size: 1.5rem;
+    }
+
+    form {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    input[type="text"] {
+      flex: 1;
+      min-width: 0;
+      min-height: 40px;
+      padding: 8px 12px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font: inherit;
+      color: var(--text);
+      background: #fff;
+      transition: border-color 150ms ease, box-shadow 150ms ease;
+    }
+
+    button {
+      font: inherit;
+      min-height: 40px;
+      padding: 8px 14px;
+      border: 1px solid transparent;
+      border-radius: 8px;
+      cursor: pointer;
+      background: var(--accent);
+      color: #fff;
+      transition: background-color 150ms ease, color 150ms ease, border-color 150ms ease, box-shadow 150ms ease;
+    }
+
+    button:hover {
+      background: var(--accent-hover);
+    }
+
+    button:focus-visible,
+    input:focus-visible {
+      outline: none;
+      box-shadow: var(--focus);
+    }
+
+    .filters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    .filters button,
+    .footer button {
+      background: #fff;
+      color: var(--text);
+      border-color: var(--border);
+    }
+
+    .filters button:hover,
+    .footer button:hover:not(:disabled) {
+      background: #f3f4f6;
+    }
+
+    .filters button[aria-pressed="true"] {
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent);
+    }
+
+    ul {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    li {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 0;
+      border-bottom: 1px solid var(--border);
+      min-height: 48px;
+    }
+
+    li:last-child {
+      border-bottom: none;
+    }
+
+    input[type="checkbox"] {
+      width: 20px;
+      height: 20px;
+      flex-shrink: 0;
+      accent-color: var(--accent);
+    }
+
+    .task-text {
+      flex: 1;
+      min-width: 0;
+      word-break: break-word;
+      cursor: text;
+    }
+
+    li.completed .task-text {
+      text-decoration: line-through;
+      color: var(--muted);
+    }
+
+    .edit-input {
+      flex: 1;
+      min-width: 0;
+      min-height: 40px;
+      padding: 8px 12px;
+      border: 1px solid var(--accent);
+      border-radius: 8px;
+      font: inherit;
+    }
+
+    .delete-btn {
+      background: transparent;
+      color: var(--danger);
+      border-color: transparent;
+      flex-shrink: 0;
+    }
+
+    .delete-btn:hover {
+      background: #fef2f2;
+      color: var(--danger-hover);
+    }
+
+    .empty {
+      margin: 8px 0 16px;
+      color: var(--muted);
+      text-align: center;
+    }
+
+    .footer {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-top: 16px;
+    }
+
+    .count {
+      color: var(--muted);
+      margin: 0;
+    }
+
+    .footer button:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>To-Do List</h1>
+    <form id="add-form">
+      <label for="task-input" class="visually-hidden" style="position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;">New task</label>
+      <input id="task-input" type="text" name="task" autocomplete="off" aria-label="New task">
+      <button type="submit">Add</button>
+    </form>
+    <div class="filters" role="group" aria-label="Filter tasks">
+      <button type="button" data-filter="all" aria-pressed="true">All</button>
+      <button type="button" data-filter="active" aria-pressed="false">Active</button>
+      <button type="button" data-filter="completed" aria-pressed="false">Completed</button>
+    </div>
+    <ul id="task-list" aria-label="Tasks"></ul>
+    <p id="empty" class="empty" hidden>No tasks yet. Add one above.</p>
+    <div class="footer">
+      <p id="count" class="count">0 items left</p>
+      <button type="button" id="clear-completed" disabled>Clear completed</button>
+    </div>
+  </main>
+
+  <script>
+    // state
+    const STORAGE_KEY = "todos";
+    let state = [];
+    let filter = "all";
+
+    const form = document.getElementById("add-form");
+    const input = document.getElementById("task-input");
+    const list = document.getElementById("task-list");
+    const empty = document.getElementById("empty");
+    const count = document.getElementById("count");
+    const clearBtn = document.getElementById("clear-completed");
+    const filterButtons = document.querySelectorAll("[data-filter]");
+
+    function createId() {
+      return (crypto.randomUUID && crypto.randomUUID()) || String(Date.now());
+    }
+
+    // storage
+    function load() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        const parsed = raw ? JSON.parse(raw) : [];
+        if (!Array.isArray(parsed)) return [];
+        return parsed
+          .filter((item) => item && typeof item.text === "string")
+          .map((item) => ({
+            id: String(item.id || createId()),
+            text: item.text,
+            completed: Boolean(item.completed),
+          }));
+      } catch (err) {
+        return [];
+      }
+    }
+
+    function save() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    }
+
+    // render
+    function visibleTasks() {
+      if (filter === "active") return state.filter((t) => !t.completed);
+      if (filter === "completed") return state.filter((t) => t.completed);
+      return state;
+    }
+
+    function render() {
+      list.replaceChildren();
+      const visible = visibleTasks();
+
+      visible.forEach((task) => {
+        const li = document.createElement("li");
+        li.dataset.id = task.id;
+        if (task.completed) li.classList.add("completed");
+
+        const checkbox = document.createElement("input");
+        checkbox.type = "checkbox";
+        checkbox.checked = task.completed;
+        checkbox.setAttribute("aria-label", "Mark complete");
+
+        const text = document.createElement("span");
+        text.className = "task-text";
+        text.textContent = task.text;
+
+        const del = document.createElement("button");
+        del.type = "button";
+        del.className = "delete-btn";
+        del.setAttribute("aria-label", "Delete task");
+        del.textContent = "Delete";
+
+        li.append(checkbox, text, del);
+        list.append(li);
+      });
+
+      empty.hidden = visible.length > 0;
+      if (state.length === 0) {
+        empty.textContent = "No tasks yet. Add one above.";
+      } else if (visible.length === 0) {
+        empty.textContent = filter === "active"
+          ? "No active tasks."
+          : "No completed tasks.";
+      }
+
+      const left = state.filter((t) => !t.completed).length;
+      count.textContent = left === 1 ? "1 item left" : left + " items left";
+
+      const hasCompleted = state.some((t) => t.completed);
+      clearBtn.disabled = !hasCompleted;
+      clearBtn.hidden = false;
+
+      filterButtons.forEach((btn) => {
+        btn.setAttribute("aria-pressed", String(btn.dataset.filter === filter));
+      });
+    }
+
+    // handlers
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const text = input.value.trim();
+      if (!text) {
+        input.focus();
+        return;
+      }
+      state.push({ id: createId(), text, completed: false });
+      input.value = "";
+      save();
+      render();
+      input.focus();
+    });
+
+    list.addEventListener("change", (e) => {
+      const checkbox = e.target.closest('input[type="checkbox"]');
+      if (!checkbox) return;
+      const li = checkbox.closest("li");
+      const task = state.find((t) => t.id === li.dataset.id);
+      if (!task) return;
+      task.completed = checkbox.checked;
+      save();
+      render();
+    });
+
+    list.addEventListener("click", (e) => {
+      const del = e.target.closest(".delete-btn");
+      if (!del) return;
+      const li = del.closest("li");
+      state = state.filter((t) => t.id !== li.dataset.id);
+      save();
+      render();
+    });
+
+    list.addEventListener("dblclick", (e) => {
+      const span = e.target.closest(".task-text");
+      if (!span) return;
+      startEdit(span.closest("li"));
+    });
+
+    function startEdit(li) {
+      const task = state.find((t) => t.id === li.dataset.id);
+      if (!task || li.querySelector(".edit-input")) return;
+
+      const span = li.querySelector(".task-text");
+      const edit = document.createElement("input");
+      edit.type = "text";
+      edit.className = "edit-input";
+      edit.value = task.text;
+      edit.setAttribute("aria-label", "Edit task");
+      span.replaceWith(edit);
+      edit.focus();
+      edit.select();
+
+      function finish(saveEdit) {
+        edit.removeEventListener("keydown", onKey);
+        edit.removeEventListener("blur", onBlur);
+        if (saveEdit) {
+          const next = edit.value.trim();
+          if (next) task.text = next;
+        }
+        save();
+        render();
+      }
+
+      function onKey(e) {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          finish(true);
+        } else if (e.key === "Escape") {
+          e.preventDefault();
+          finish(false);
+        }
+      }
+
+      function onBlur() {
+        finish(true);
+      }
+
+      edit.addEventListener("keydown", onKey);
+      edit.addEventListener("blur", onBlur);
+    }
+
+    filterButtons.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        filter = btn.dataset.filter;
+        render();
+      });
+    });
+
+    clearBtn.addEventListener("click", () => {
+      state = state.filter((t) => !t.completed);
+      save();
+      render();
+    });
+
+    // init
+    state = load();
+    render();
+    input.focus();
+  </script>
+</body>
+</html>
